@@ -10,37 +10,44 @@ const App = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios
-      .get("https://swapi.dev/api/people/?page=1")
-      .then(({ data }) => {
-        setCharacters(data.results);
-      })
-      .then((test) => console.log(test));
+    axios.get("https://swapi.dev/api/people/?page=1").then(({ data }) => {
+      setCharacters(data.results);
+    });
   }, []);
 
   useEffect(() => {
     const controller = new AbortController();
-
-    let planetsArray = [];
-    characters.forEach((character) => {
-      const planetReformatted: string = character.homeworld
-        .split("/")
-        .slice(4, 6)
-        .join("");
-      if (!Object.values(planetsArray).includes(character.homeworld)) {
-        const controller = new AbortController();
-        axios.get(character.homeworld).then(({ data }) => {
-          planetsArray = [
-            ...planetsArray,
-            { planetReformatted: data.name, url: character.homeworld },
-          ];
-          planetsArray.forEach((planet) => console.log(planet));
-          return controller.abort();
-        });
-      }
-    });
+    if (characters.length) {
+      axios
+        .all(characters.map((character) => axios.get(character.homeworld)))
+        .then((data) => console.log(data));
+    }
     return controller.abort();
   }, [characters]);
+
+  // useEffect(() => {
+  //   const controller = new AbortController();
+
+  //   let planetsArray = [];
+  //   characters.forEach((character) => {
+  //     const planetReformatted: string = character.homeworld
+  //       .split("/")
+  //       .slice(4, 6)
+  //       .join("");
+  //     if (!Object.values(planetsArray).includes(character.homeworld)) {
+  //       const controller = new AbortController();
+  //       axios.get(character.homeworld).then(({ data }) => {
+  //         planetsArray = [
+  //           ...planetsArray,
+  //           { planetReformatted: data.name, url: character.homeworld },
+  //         ];
+  //         // planetsArray.forEach((planet) => console.log(planet));
+  //         return controller.abort();
+  //       });
+  //     }
+  //   });
+  //   return controller.abort();
+  // }, [characters]);
 
   // // // // // // // // // // // // // // // //
 
@@ -76,6 +83,7 @@ const App = () => {
         </thead>
         <tbody>
           {characters.length > 0 &&
+            planets.length > 0 &&
             characters.map((character) => {
               return (
                 <tr key={crypto.randomUUID()}>
