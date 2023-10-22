@@ -2,43 +2,44 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 const App = () => {
-  const defaultPlanets = localStorage.getItem("planets") || [];
-  const defaultSpecies = localStorage.getItem("species") || [];
-  const defaultCharacters = JSON.parse(localStorage.getItem("character")) || [];
-
-  const [planets, setPlanets] = useState(defaultPlanets);
-  const [species, setSpecies] = useState(defaultSpecies);
-  const [characters, setCharacters] = useState(defaultCharacters);
+  const [planets, setPlanets] = useState<string[]>([]);
+  const [species, setSpecies] = useState([]);
+  const [characters, setCharacters] = useState([]);
+  const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
-    axios.get("https://swapi.dev/api/people/?page=1").then((data) => {
-      setCharacters(data.data.results);
-    });
+    setLoading(true);
+    axios
+      .get("https://swapi.dev/api/people/?page=1")
+      .then((data) => {
+        setCharacters(data.data.results);
+      })
+      .then();
   }, []);
 
-  useEffect(() => {
-    const controller = new AbortController();
+  // useEffect(() => {
+  //   const controller = new AbortController();
 
-    let planetsArray = [];
-    characters.forEach((character) => {
-      const planetReformatted: string = character.homeworld
-        .split("/")
-        .slice(4, 6)
-        .join("");
-      if (!Object.values(planetsArray).includes(character.homeworld)) {
-        const controller = new AbortController();
-        axios.get(character.homeworld).then(({ data }) => {
-          planetsArray = [
-            ...planetsArray,
-            { planetReformatted: data.name, url: character.homeworld },
-          ];
-          planetsArray.forEach((planet) => console.log(planet));
-          return controller.abort();
-        });
-      }
-    });
-    return controller.abort();
-  }, [characters]);
+  //   let planetsArray = [];
+  //   characters.forEach((character) => {
+  //     const planetReformatted: string = character.homeworld
+  //       .split("/")
+  //       .slice(4, 6)
+  //       .join("");
+  //     if (!Object.values(planetsArray).includes(character.homeworld)) {
+  //       const controller = new AbortController();
+  //       axios.get(character.homeworld).then(({ data }) => {
+  //         planetsArray = [
+  //           ...planetsArray,
+  //           { planetReformatted: data.name, url: character.homeworld },
+  //         ];
+  //         planetsArray.forEach((planet) => console.log(planet));
+  //         return controller.abort();
+  //       });
+  //     }
+  //   });
+  //   return controller.abort();
+  // }, [characters]);
 
   // // // // // // // // // // // // // // // //
 
@@ -72,7 +73,7 @@ const App = () => {
                   <td>{formatBirthYear(character)}</td>
                   <td>{character.height} cm</td>
                   <td>{character.mass} kg</td>
-                  <td>{}</td>
+                  <td>{fetchPlanet(character.homeworld)}</td>
                   <td>{}</td>
                 </tr>
               );
