@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import "./App.css";
 
 const App = () => {
   const [planets, setPlanets] = useState<string[]>([]);
@@ -11,35 +12,35 @@ const App = () => {
     setLoading(true);
     axios
       .get("https://swapi.dev/api/people/?page=1")
-      .then((data) => {
-        setCharacters(data.data.results);
+      .then(({ data }) => {
+        setCharacters(data.results);
       })
-      .then();
+      .then((test) => console.log(test));
   }, []);
 
-  // useEffect(() => {
-  //   const controller = new AbortController();
+  useEffect(() => {
+    const controller = new AbortController();
 
-  //   let planetsArray = [];
-  //   characters.forEach((character) => {
-  //     const planetReformatted: string = character.homeworld
-  //       .split("/")
-  //       .slice(4, 6)
-  //       .join("");
-  //     if (!Object.values(planetsArray).includes(character.homeworld)) {
-  //       const controller = new AbortController();
-  //       axios.get(character.homeworld).then(({ data }) => {
-  //         planetsArray = [
-  //           ...planetsArray,
-  //           { planetReformatted: data.name, url: character.homeworld },
-  //         ];
-  //         planetsArray.forEach((planet) => console.log(planet));
-  //         return controller.abort();
-  //       });
-  //     }
-  //   });
-  //   return controller.abort();
-  // }, [characters]);
+    let planetsArray = [];
+    characters.forEach((character) => {
+      const planetReformatted: string = character.homeworld
+        .split("/")
+        .slice(4, 6)
+        .join("");
+      if (!Object.values(planetsArray).includes(character.homeworld)) {
+        const controller = new AbortController();
+        axios.get(character.homeworld).then(({ data }) => {
+          planetsArray = [
+            ...planetsArray,
+            { planetReformatted: data.name, url: character.homeworld },
+          ];
+          planetsArray.forEach((planet) => console.log(planet));
+          return controller.abort();
+        });
+      }
+    });
+    return controller.abort();
+  }, [characters]);
 
   // // // // // // // // // // // // // // // //
 
@@ -50,10 +51,19 @@ const App = () => {
   };
 
   return (
-    <div className="p-5">
-      <h1 className="mb-2 text-center">StarWars</h1>
-      <input type="text" id="search" alt="Search Bar" className="mb-4" />
-      <table className="table table-bordered">
+    <div className="p-5 pt-0 main-bg">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Star_Wars_Logo..png/640px-Star_Wars_Logo..png"
+        alt=""
+      />
+      <input
+        placeholder="Search by keyword"
+        type="text"
+        id="search"
+        alt="Search Bar"
+        className="mb-4 bg-transparent"
+      />
+      <table className="table table-bordered mb-5 ">
         <thead>
           <tr>
             <th>Name</th>
@@ -73,7 +83,7 @@ const App = () => {
                   <td>{formatBirthYear(character)}</td>
                   <td>{character.height} cm</td>
                   <td>{character.mass} kg</td>
-                  <td>{fetchPlanet(character.homeworld)}</td>
+                  <td>{}</td>
                   <td>{}</td>
                 </tr>
               );
