@@ -9,10 +9,12 @@ const App = () => {
   const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
     axios.get("https://swapi.dev/api/people/?page=1").then(({ data }) => {
       setCharacters(data.results);
     });
+    return controller.abort();
   }, []);
 
   useEffect(() => {
@@ -20,7 +22,9 @@ const App = () => {
     if (characters.length) {
       axios
         .all(characters.map((character) => axios.get(character.homeworld)))
-        .then((data) => console.log(data));
+        .then((data) =>
+          data.forEach((object) => console.log(object.data.name))
+        );
     }
     return controller.abort();
   }, [characters]);
