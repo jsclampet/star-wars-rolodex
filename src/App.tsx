@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import "./App.css";
+import apiClient from "./services/apiClient";
+import userService from "./services/user-service";
 
 const App = () => {
   const [planets, setPlanets] = useState<string[]>([]);
@@ -9,23 +11,18 @@ const App = () => {
   const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
-    const controller = new AbortController();
-
     setLoading(true);
-    axios.get("https://swapi.dev/api/people/?page=1").then(({ data }) => {
+    const { request, cancel } = userService.getAllPeople();
+    request.then(({ data }) => {
       setCharacters(data.results);
     });
-
-    return controller.abort();
+    return cancel;
   }, []);
 
   useEffect(() => {
     const controller = new AbortController();
 
     if (characters.length) {
-      const planetUrls = Array.from(
-        new Set(characters.map((char) => char.homeworld))
-      );
       axios.all(planetUrls.map((url) => axios.get(url))).then((data) => {
         const planetNames = [];
         data.forEach((response, i) => {
@@ -55,6 +52,10 @@ const App = () => {
         });
       });
   }, [characters]);
+
+  const planetUrls = Array.from(
+    new Set(characters.map((char) => char.homeworld))
+  );
 
   const formatBirthYear = (character) => {
     return character.birth_year == "unknown"
