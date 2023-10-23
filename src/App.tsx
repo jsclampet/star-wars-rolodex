@@ -10,50 +10,51 @@ const App = () => {
 
   useEffect(() => {
     const controller = new AbortController();
+
     setLoading(true);
     axios.get("https://swapi.dev/api/people/?page=1").then(({ data }) => {
       setCharacters(data.results);
     });
+
     return controller.abort();
   }, []);
 
   useEffect(() => {
     const controller = new AbortController();
+
     if (characters.length) {
-      axios
-        .all(characters.map((character) => axios.get(character.homeworld)))
-        .then((data) =>
-          data.forEach((object) => console.log(object.data.name))
-        );
+      const planetUrls = Array.from(
+        new Set(characters.map((char) => char.homeworld))
+      );
+      axios.all(planetUrls.map((url) => axios.get(url))).then((data) => {
+        const planetNames = [];
+        data.forEach((response, i) => {
+          planetNames.push({ url: planetUrls[i], name: response.data.name });
+        });
+        setPlanets(planetNames);
+      });
+      return controller.abort();
     }
-    return controller.abort();
+
+    setLoading(false);
   }, [characters]);
 
-  // useEffect(() => {
-  //   const controller = new AbortController();
-
-  //   let planetsArray = [];
-  //   characters.forEach((character) => {
-  //     const planetReformatted: string = character.homeworld
-  //       .split("/")
-  //       .slice(4, 6)
-  //       .join("");
-  //     if (!Object.values(planetsArray).includes(character.homeworld)) {
-  //       const controller = new AbortController();
-  //       axios.get(character.homeworld).then(({ data }) => {
-  //         planetsArray = [
-  //           ...planetsArray,
-  //           { planetReformatted: data.name, url: character.homeworld },
-  //         ];
-  //         // planetsArray.forEach((planet) => console.log(planet));
-  //         return controller.abort();
-  //       });
-  //     }
-  //   });
-  //   return controller.abort();
-  // }, [characters]);
-
-  // // // // // // // // // // // // // // // //
+  useEffect(() => {
+    const controller = new AbortController();
+    const knownSpecies = characters.filter((char) => char.species.length > 0);
+    const knownSpeciesUrls = Array.from(
+      new Set(knownSpecies.map((char) => char.species[0]))
+    );
+    const speciesNamesAndURLs = [];
+    axios
+      .all(knownSpeciesUrls.map((url) => axios.get(url)))
+      .then((responses) => {
+        responses.forEach(({ data }) => {
+          speciesNamesAndURLs.push({ name: data.name, url: data.url });
+          setSpecies(speciesNamesAndURLs);
+        });
+      });
+  }, [characters]);
 
   const formatBirthYear = (character) => {
     return character.birth_year == "unknown"
@@ -88,6 +89,7 @@ const App = () => {
         <tbody>
           {characters.length > 0 &&
             planets.length > 0 &&
+            species.length > 0 &&
             characters.map((character) => {
               return (
                 <tr key={crypto.randomUUID()}>
@@ -95,8 +97,20 @@ const App = () => {
                   <td>{formatBirthYear(character)}</td>
                   <td>{character.height} cm</td>
                   <td>{character.mass} kg</td>
-                  <td>{}</td>
-                  <td>{}</td>
+                  <td>
+                    {
+                      planets.filter(
+                        (planet) => planet.url === character.homeworld
+                      )[0].name
+                    }
+                  </td>
+                  <td>
+                    {character.species.length
+                      ? species.filter(
+                          (specie) => specie.url === character.species[0]
+                        )[0].name
+                      : "Unknown"}
+                  </td>
                 </tr>
               );
             })}
