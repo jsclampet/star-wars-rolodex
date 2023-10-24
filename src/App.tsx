@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import "./App.css";
-import apiClient from "./services/apiClient";
 import userService from "./services/user-service";
 
 const App = () => {
@@ -72,13 +71,16 @@ const App = () => {
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Star_Wars_Logo..png/640px-Star_Wars_Logo..png"
         alt=""
       />
-      <input
-        placeholder="Search by keyword"
-        type="text"
-        id="search"
-        alt="Search Bar"
-        className="mb-4 bg-transparent"
-      />
+      <form action="">
+        <input
+          placeholder="Search by keyword"
+          type="search"
+          id="search"
+          alt="Search Bar"
+          className="mb-4 bg-transparent"
+        />
+        <button className="btn btn-light">🔍</button>
+      </form>
       <table className="table table-bordered mb-5 ">
         <thead>
           <tr>
@@ -121,6 +123,35 @@ const App = () => {
             })}
         </tbody>
       </table>
+      <nav aria-label="Page navigation">
+        <ul className="pagination">
+          <li className="page-item">
+            <a className="page-link" href="#">
+              Previous
+            </a>
+          </li>
+          <li className="page-item">
+            <a className="page-link" href="#">
+              1
+            </a>
+          </li>
+          <li className="page-item">
+            <a className="page-link" href="#">
+              2
+            </a>
+          </li>
+          <li className="page-item">
+            <a className="page-link" href="#">
+              3
+            </a>
+          </li>
+          <li className="page-item">
+            <a className="page-link" href="#">
+              Next
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 };
