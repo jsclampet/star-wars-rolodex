@@ -20,19 +20,21 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const controller = new AbortController();
-
+    const { request, cancel } =
+      userService.getMultipleResponses(planetEndpoints);
     if (characters.length) {
-      axios.all(planetUrls.map((url) => axios.get(url))).then((data) => {
+      request.then((data) => {
         const planetNames = [];
         data.forEach((response, i) => {
-          planetNames.push({ url: planetUrls[i], name: response.data.name });
+          planetNames.push({
+            url: planetEndpoints[i],
+            name: response.data.name,
+          });
         });
         setPlanets(planetNames);
       });
-      return controller.abort();
+      return () => cancel();
     }
-
     setLoading(false);
   }, [characters]);
 
@@ -50,11 +52,12 @@ const App = () => {
           speciesNamesAndURLs.push({ name: data.name, url: data.url });
           setSpecies(speciesNamesAndURLs);
         });
-      });
+      })
+      .then(() => setSpecies(speciesNamesAndURLs));
   }, [characters]);
 
-  const planetUrls = Array.from(
-    new Set(characters.map((char) => char.homeworld))
+  const planetEndpoints = Array.from(
+    new Set(characters.map((char) => char.homeworld.split("api")[2]))
   );
 
   const formatBirthYear = (character) => {
@@ -101,12 +104,13 @@ const App = () => {
                   <td>
                     {
                       planets.filter(
-                        (planet) => planet.url === character.homeworld
+                        (planet) =>
+                          planet.url === character.homeworld.split("api")[2]
                       )[0].name
                     }
                   </td>
                   <td>
-                    {character.species.length
+                    {character.species.length > 0
                       ? species.filter(
                           (specie) => specie.url === character.species[0]
                         )[0].name

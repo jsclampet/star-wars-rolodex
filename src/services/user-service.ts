@@ -1,5 +1,5 @@
 import apiClient from "./apiClient";
-
+import axios from "axios";
 class UserService {
   getAllPeople() {
     const controller = new AbortController();
@@ -8,10 +8,10 @@ class UserService {
     return { request, cancel: ()=> controller.abort() }
   }
   
-  getSpecies(dependency) {
-    if (dependency.length) {
-      axios.all(planetUrls.map((url) => axios.get(url)))
-    }
+  getMultipleResponses(arrayOfURLs){
+  const controller = new AbortController();
+  const request = axios.all(arrayOfURLs.map((url) => apiClient.get(url)))
+  return { request , cancel: ()=> controller.abort() }
   }
 }
 export default new UserService();
