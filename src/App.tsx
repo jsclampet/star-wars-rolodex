@@ -8,15 +8,16 @@ const App = () => {
   const [species, setSpecies] = useState([]);
   const [characters, setCharacters] = useState([]);
   const [isLoading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     setLoading(true);
-    const { request, cancel } = userService.getAllPeople();
+    const { request, cancel } = userService.getAllPeople(page);
     request.then(({ data }) => {
       setCharacters(data.results);
     });
     return cancel;
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     const { request, cancel } =
@@ -35,7 +36,7 @@ const App = () => {
       return () => cancel();
     }
     setLoading(false);
-  }, [characters]);
+  }, [characters, page]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -52,7 +53,9 @@ const App = () => {
           setSpecies(speciesNamesAndURLs);
         });
       })
-      .then(() => setSpecies(speciesNamesAndURLs));
+      .then(() => setSpecies(speciesNamesAndURLs))
+      .then(() => setLoading(false));
+    return () => controller.abort();
   }, [characters]);
 
   const planetEndpoints = Array.from(
@@ -71,87 +74,104 @@ const App = () => {
         src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Star_Wars_Logo..png/640px-Star_Wars_Logo..png"
         alt=""
       />
-      <form action="">
-        <input
-          placeholder="Search by keyword"
-          type="search"
-          id="search"
-          alt="Search Bar"
-          className="mb-4 bg-transparent"
-        />
-        <button className="btn btn-light">🔍</button>
-      </form>
-      <table className="table table-bordered mb-5 ">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Birth Date</th>
-            <th>Height</th>
-            <th>Mass</th>
-            <th>Home World</th>
-            <th>Species</th>
-          </tr>
-        </thead>
-        <tbody>
-          {characters.length > 0 &&
-            planets.length > 0 &&
-            species.length > 0 &&
-            characters.map((character) => {
-              return (
-                <tr key={crypto.randomUUID()}>
-                  <td>{character.name}</td>
-                  <td>{formatBirthYear(character)}</td>
-                  <td>{character.height} cm</td>
-                  <td>{character.mass} kg</td>
-                  <td>
-                    {
-                      planets.filter(
-                        (planet) =>
-                          planet.url === character.homeworld.split("api")[2]
-                      )[0].name
-                    }
-                  </td>
-                  <td>
-                    {character.species.length > 0
-                      ? species.filter(
-                          (specie) => specie.url === character.species[0]
+      {isLoading && (
+        <h1 className="text-light text-center">Loading, please wait!</h1>
+      )}
+      <div className={isLoading ? "hidden" : "visible"}>
+        <form action="" className="">
+          <div className="form-group mb-4">
+            <input
+              placeholder="Search by keyword"
+              type="search"
+              id="search"
+              alt="Search Bar"
+              className=" bg-transparent"
+            />
+            <button className="btn btn-secondary " type="submit">
+              Search
+            </button>
+          </div>
+        </form>
+        <table className="table table-bordered mb-4">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Birth Date</th>
+              <th>Height</th>
+              <th>Mass</th>
+              <th>Home World</th>
+              <th>Species</th>
+            </tr>
+          </thead>
+          <tbody>
+            {characters.length > 0 &&
+              planets.length > 0 &&
+              species.length > 0 &&
+              characters.map((character) => {
+                return (
+                  <tr key={crypto.randomUUID()}>
+                    <td>{character.name}</td>
+                    <td>{formatBirthYear(character)}</td>
+                    <td>{character.height} cm</td>
+                    <td>
+                      {character.mass === "unknown"
+                        ? "unknown"
+                        : character.mass + " kg"}
+                    </td>
+                    <td>
+                      {
+                        planets.filter(
+                          (planet) =>
+                            planet.url === character.homeworld.split("api")[2]
                         )[0].name
-                      : "Unknown"}
-                  </td>
-                </tr>
-              );
-            })}
-        </tbody>
-      </table>
-      <nav aria-label="Page navigation">
-        <ul className="pagination">
-          <li className="page-item">
-            <a className="page-link" href="#">
-              Previous
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#">
-              1
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#">
-              2
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#">
-              3
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link" href="#">
-              Next
-            </a>
-          </li>
-        </ul>
-      </nav>
+                      }
+                    </td>
+                    <td>
+                      {character.species.length > 0
+                        ? species.filter(
+                            (specie) => specie.url === character.species[0]
+                          )[0].name
+                        : "Unknown"}
+                    </td>
+                  </tr>
+                );
+              })}
+          </tbody>
+        </table>
+        <nav aria-label="Page navigation">
+          <ul className="pagination">
+            <li className="page-item">
+              <a className="page-link" href="#">
+                Previous
+              </a>
+            </li>
+            <li className="page-item">
+              <a className="page-link" href="#">
+                1
+              </a>
+            </li>
+            <li className="page-item">
+              <a className="page-link" href="#">
+                2
+              </a>
+            </li>
+            <li className="page-item">
+              <a className="page-link" href="#">
+                3
+              </a>
+            </li>
+            <li className="page-item">
+              <a
+                className="page-link"
+                href="#"
+                onClick={() => setPage(page + 1)}
+              >
+                Next
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
   );
 };

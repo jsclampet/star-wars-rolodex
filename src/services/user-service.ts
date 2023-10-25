@@ -1,10 +1,10 @@
 import apiClient from "./apiClient";
 import axios from "axios";
 class UserService {
-  getAllPeople() {
-    const controller = new AbortController();
-    const request = apiClient.get("/people/?page=1")
 
+  getAllPeople(pageNumber: number) {
+    const controller = new AbortController();
+    const request = apiClient.get(`/people/?page=${pageNumber}`)
     return { request, cancel: ()=> controller.abort() }
   }
   
@@ -13,5 +13,6 @@ class UserService {
   const request = axios.all(arrayOfURLs.map((url) => apiClient.get(url)))
   return { request , cancel: ()=> controller.abort() }
   }
+  
 }
 export default new UserService();
