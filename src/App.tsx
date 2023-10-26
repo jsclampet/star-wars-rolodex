@@ -4,7 +4,7 @@ import "./App.css";
 import userService from "./services/user-service";
 
 const App = () => {
-  const [planets, setPlanets] = useState<string[]>([]);
+  const [planets, setPlanets] = useState([]);
   const [species, setSpecies] = useState([]);
   const [characters, setCharacters] = useState([]);
   const [isLoading, setLoading] = useState(true);
@@ -119,12 +119,11 @@ const App = () => {
                         : character.mass + " kg"}
                     </td>
                     <td>
-                      {
+                      {planets.length > 0 &&
                         planets.filter(
                           (planet) =>
                             planet.url === character.homeworld.split("api")[2]
-                        )[0].name
-                      }
+                        )[0].name}
                     </td>
                     <td>
                       {character.species.length > 0
