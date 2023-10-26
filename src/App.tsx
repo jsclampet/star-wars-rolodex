@@ -16,7 +16,7 @@ const App = () => {
     request.then(({ data }) => {
       setCharacters(data.results);
     });
-    return cancel;
+    return () => cancel();
   }, [page]);
 
   useEffect(() => {
