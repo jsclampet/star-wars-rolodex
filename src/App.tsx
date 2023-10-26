@@ -7,7 +7,7 @@ const App = () => {
   const [planets, setPlanets] = useState<string[]>([]);
   const [species, setSpecies] = useState([]);
   const [characters, setCharacters] = useState([]);
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -16,10 +16,14 @@ const App = () => {
     request.then(({ data }) => {
       setCharacters(data.results);
     });
+
     return () => cancel();
   }, [page]);
 
   useEffect(() => {
+    const planetEndpoints = Array.from(
+      new Set(characters.map((char) => char.homeworld.split("api")[2]))
+    );
     const { request, cancel } =
       userService.getMultipleResponses(planetEndpoints);
     if (characters.length) {
@@ -36,7 +40,7 @@ const App = () => {
       return () => cancel();
     }
     setLoading(false);
-  }, [characters, page]);
+  }, [characters]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -57,10 +61,6 @@ const App = () => {
       .then(() => setLoading(false));
     return () => controller.abort();
   }, [characters]);
-
-  const planetEndpoints = Array.from(
-    new Set(characters.map((char) => char.homeworld.split("api")[2]))
-  );
 
   const formatBirthYear = (character) => {
     return character.birth_year == "unknown"
