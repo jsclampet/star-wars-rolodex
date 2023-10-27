@@ -10,14 +10,21 @@ const App = () => {
   const [isLoading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
+  useEffect(async () => {
     setLoading(true);
-    const { request, cancel } = userService.getAllPeople(page);
-    request.then(({ data }) => {
-      setCharacters(data.results);
-    });
+    const characters = await axios.get("https://swapi.dev/api/people");
 
-    return () => cancel();
+    for (const character of characters) {
+      // get species data
+      const speciesResponse = await axios.get(character.species[0]);
+      character.speciesName = speciesResponse.data.name;
+      // get planert data
+      const planetResponse = await axios.get(character.homeworld);
+      character.homeworldName = planetResponse.data.name;
+    }
+
+    // set character data to state
+    setCharacters(characters);
   }, [page]);
 
   useEffect(() => {
@@ -123,25 +130,13 @@ const App = () => {
                         // ADDING STRINGIFY TO SEE WHAT IS OBJECTS ARE BEING RETURNED
                         // WITHOUT STRINGIFY, CODE BREAKS:
                         //    --- ERROR MESSAGE name is undefined
-                        JSON.stringify(
-                          planets.filter(
-                            (planet) =>
-                              planet.url === character.homeworld.split("api")[2]
-                          )[0]
-                        )}
+
+                        planets.filter(
+                          (planet) =>
+                            planet.url === character.homeworld.split("api")[2]
+                        )[0].name}
                     </td>
-                    <td>
-                      {character.species.length > 0
-                        ? // ADDING STRINGIFY TO SEE WHAT IS OBJECTS ARE BEING RETURNED
-                          // WITHOUT STRINGIFY, CODE BREAKS:
-                          //    --- ERROR MESSAGE name is undefined
-                          JSON.stringify(
-                            species.filter(
-                              (specie) => specie.url === character.species[0]
-                            )[0]
-                          )
-                        : "Unknown"}
-                    </td>
+                    <td>{character.speciesName}</td>
                   </tr>
                 );
               })}
