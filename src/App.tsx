@@ -120,16 +120,26 @@ const App = () => {
                     </td>
                     <td>
                       {planets.length > 0 &&
-                        planets.filter(
-                          (planet) =>
-                            planet.url === character.homeworld.split("api")[2]
-                        )[0].name}
+                        // ADDING STRINGIFY TO SEE WHAT IS OBJECTS ARE BEING RETURNED
+                        // WITHOUT STRINGIFY, CODE BREAKS:
+                        //    --- ERROR MESSAGE name is undefined
+                        JSON.stringify(
+                          planets.filter(
+                            (planet) =>
+                              planet.url === character.homeworld.split("api")[2]
+                          )[0]
+                        )}
                     </td>
                     <td>
                       {character.species.length > 0
-                        ? species.filter(
-                            (specie) => specie.url === character.species[0]
-                          )[0].name
+                        ? // ADDING STRINGIFY TO SEE WHAT IS OBJECTS ARE BEING RETURNED
+                          // WITHOUT STRINGIFY, CODE BREAKS:
+                          //    --- ERROR MESSAGE name is undefined
+                          JSON.stringify(
+                            species.filter(
+                              (specie) => specie.url === character.species[0]
+                            )[0]
+                          )
                         : "Unknown"}
                     </td>
                   </tr>
@@ -140,7 +150,11 @@ const App = () => {
         <nav aria-label="Page navigation">
           <ul className="pagination">
             <li className="page-item">
-              <a className="page-link" href="#">
+              <a
+                className="page-link"
+                onClick={() => (page > 1 ? setPage((prev) => prev - 1) : page)}
+                href="#"
+              >
                 Previous
               </a>
             </li>
