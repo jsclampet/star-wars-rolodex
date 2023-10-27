@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { Axios } from "axios";
 import { useEffect, useState } from "react";
 import "./App.css";
 import userService from "./services/user-service";
@@ -18,14 +18,29 @@ const App = () => {
         `https://swapi.dev/api/people/?page=${page}`,
         { signal: controller.signal }
       );
-      console.log("People", requestPeople.data.results[0].homeworld);
+      const planetURLs = requestPeople.data.results.map(
+        (character) => character.homeworld
+      );
+      const requestPlanets = await Promise.all(
+        planetURLs.map((url) => axios.get(url, { signal: controller.signal }))
+      );
+      requestPlanets.forEach(({ data }, i) => {
+        console.log(i, data.url, data.name);
+      });
+      const speciesURLs = requestPeople.data.results.map(
+        (character) => character.species[0]
+      );
+      const requestSpecies = await Promise.all(
+        speciesURLs.map((url) => axios.get(url, { signal: controller.signal }))
+      );
+      // requestSpecies.forEach(({ data }, i) => {
+      //   console.log(i, data);
+      // });
+      console.log(requestSpecies);
 
-      const requestPlanets = await Promise.all();
       return requestPeople;
     }
     getCharacters();
-
-    async function getPlanets() {}
     // for (const character of characters) {
     //   // get species data
     //   const speciesResponse = await axios.get(character.species[0]);
