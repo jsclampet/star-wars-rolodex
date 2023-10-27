@@ -12,12 +12,15 @@ const App = () => {
 
   useEffect(() => {
     const controller = new AbortController();
+
     async function getCharacters() {
       setLoading(true);
+
       const requestPeople = await axios.get(
         `https://swapi.dev/api/people/?page=${page}`,
         { signal: controller.signal }
       );
+
       const planetURLs = requestPeople.data.results.map(
         (character) => character.homeworld
       );
@@ -27,16 +30,16 @@ const App = () => {
       requestPlanets.forEach(({ data }, i) => {
         console.log(i, data.url, data.name);
       });
-      const speciesURLs = requestPeople.data.results.map(
-        (character) => character.species[0]
-      );
+
+      const specieURLs = requestPeople.data.results
+        .filter((character) => character.species.length)
+        .map((character) => character.species[0]);
       const requestSpecies = await Promise.all(
-        speciesURLs.map((url) => axios.get(url, { signal: controller.signal }))
+        specieURLs.map((url) => axios.get(url, { signal: controller.signal }))
       );
-      // requestSpecies.forEach(({ data }, i) => {
-      //   console.log(i, data);
-      // });
-      console.log(requestSpecies);
+      requestSpecies.forEach(({ data }, i) => {
+        console.log(i, data.url, data.name);
+      });
 
       return requestPeople;
     }
@@ -50,57 +53,6 @@ const App = () => {
     //   character.homeworldName = planetResponse.data.name;
     return () => controller.abort();
   }, [page]);
-  //     // set character data to state
-  //     setCharacters(characters);
-  //   }, [page]);
-
-  //   useEffect(() => {
-  //     const planetEndpoints = Array.from(
-  //       new Set(characters.map((char) => char.homeworld.split("api")[2]))
-  //     );
-  //     const { request, cancel } =
-  //       userService.getMultipleResponses(planetEndpoints);
-  //     if (characters.length) {
-  //       request.then((data) => {
-  //         const planetNames = [];
-  //         data.forEach((response, i) => {
-  //           planetNames.push({
-  //             url: planetEndpoints[i],
-  //             name: response.data.name,
-  //           });
-  //         });
-  //         setPlanets(planetNames);
-  //       });
-  //       return () => cancel();
-  //     }
-  //     setLoading(false);
-  //   }, [characters]);
-
-  //   useEffect(() => {
-  //     const controller = new AbortController();
-  //     const knownSpecies = characters.filter((char) => char.species.length > 0);
-  //     const knownSpeciesUrls = Array.from(
-  //       new Set(knownSpecies.map((char) => char.species[0]))
-  //     );
-  //     const speciesNamesAndURLs = [];
-  //     axios
-  //       .all(knownSpeciesUrls.map((url) => axios.get(url)))
-  //       .then((responses) => {
-  //         responses.forEach(({ data }) => {
-  //           speciesNamesAndURLs.push({ name: data.name, url: data.url });
-  //           setSpecies(speciesNamesAndURLs);
-  //         });
-  //       })
-  //       .then(() => setSpecies(speciesNamesAndURLs))
-  //       .then(() => setLoading(false));
-  //     return () => controller.abort();
-  //   }, [characters]);
-
-  //   const formatBirthYear = (character) => {
-  //     return character.birth_year == "unknown"
-  //       ? character.birth_year
-  //       : character.birth_year.split("B")[0] + " BBY";
-  //   };
 
   return "hello";
   // return (
