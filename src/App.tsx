@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import Table, { Specie, Character, HomeWorld } from "./components/Table";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import Nav from "./components/Nav";
 
 const App = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -68,39 +69,7 @@ const App = () => {
         <h1 className="text-light text-center mt-5">Loading, please wait!</h1>
       )}
       <div className={isLoading ? "hidden" : "visible"}>
-        <nav>
-          <button
-            className="btn btn-light"
-            disabled={page === 1}
-            onClick={() => (page > 1 ? setPage((prev) => prev - 1) : page)}
-          >
-            <BsChevronLeft />
-          </button>
-
-          <form action="" className="">
-            <div className="form-group mb-4">
-              <input
-                placeholder="Search by keyword"
-                type="search"
-                id="search"
-                alt="Search Bar"
-                className=" bg-transparent"
-              />
-              <button className="btn btn-secondary " type="submit">
-                Search
-              </button>
-            </div>
-          </form>
-
-          <button
-            className="btn btn-light"
-            disabled={page === 9}
-            onClick={() => setPage(page < 9 ? page + 1 : page)}
-          >
-            <BsChevronRight />
-          </button>
-        </nav>
-
+        <Nav />
         {!isLoading && (
           <Table
             characters={characters}

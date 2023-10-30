@@ -1,7 +1,7 @@
 img {
   display: block;
   margin: auto;
-  width: 320px;
+  width: 350px;
 }
 
 #search {
@@ -32,10 +32,19 @@ img {
 nav {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
   align-items: center;
 }
 
-nav button {
-  padding: 15px;
+nav .nav-btn {
+  height: 60px;
+  width: 60px;
+  border-radius: 100%;
+  background-color: #FFE81F;
+  color: black;
+  font-weight: 900;
+}
+
+nav .nav-btn:hover {
+  background-color: white;
 }
