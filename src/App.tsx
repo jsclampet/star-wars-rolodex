@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import "./App.css";
+import Table from "./components/Table";
 
 const App = () => {
   const [characters, setCharacters] = useState([]);
@@ -95,33 +96,14 @@ const App = () => {
           </div>
         </form>
 
-        <table className="table table-bordered mb-4">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Birth Date</th>
-              <th>Height</th>
-              <th>Mass</th>
-              <th>Home World</th>
-              <th>Species</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!isLoading &&
-              characters.map((character) => {
-                return (
-                  <tr key={crypto.randomUUID()}>
-                    <td>{character.name}</td>
-                    <td>{formatBirthYear(character)}</td>
-                    <td>{character.height} cm</td>
-                    <td>{character.mass} kg</td>
-                    <td>{getHomeWorld(character) || "hello"}</td>
-                    <td>{getSpecies(character) || "hello"}</td>
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
+        {!isLoading && (
+          <Table
+            characters={characters}
+            homeWorld={homeWorld}
+            species={species}
+          />
+        )}
+
         <nav aria-label="Page navigation">
           <ul className="pagination">
             <li className="page-item">
@@ -184,7 +166,7 @@ const App = () => {
                 className="page-link"
                 href="#"
                 aria-disabled={page === 9}
-                onClick={() => setPage(page + 1)}
+                onClick={() => setPage(page < 9 ? page + 1 : page)}
               >
                 Next
               </a>
