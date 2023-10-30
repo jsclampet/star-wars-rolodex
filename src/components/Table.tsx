@@ -1,4 +1,4 @@
-interface Character {
+export interface Character {
   name: string;
   height: number;
   mass: number;
@@ -7,12 +7,12 @@ interface Character {
   species: string[];
 }
 
-interface HomeWorld {
+export interface HomeWorld {
   name: string;
   url: string;
 }
 
-interface Specie {
+export interface Specie {
   name: string;
   url: string;
 }

@@ -24,18 +24,18 @@ img {
   display: flex;
   justify-content: center;
 }
-
-nav {
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  left: 50%;
-  bottom: 5px;
-  transform: translateX(-50%);
-  margin-top: 20px;
-} 
-
 /* Utility */
 .hidden {
   display: none;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  align-items: center;
+}
+
+nav button {
+  padding: 15px;
 }
