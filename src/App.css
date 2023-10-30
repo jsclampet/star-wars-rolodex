@@ -1,7 +1,7 @@
 img {
   display: block;
   margin: auto;
-  width: 400px;
+  width: 320px;
 }
 
 #search {
@@ -28,8 +28,12 @@ img {
 nav {
   display: flex;
   justify-content: center;
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  transform: translateX(-50%);
+  margin-top: 20px;
 } 
-
 
 /* Utility */
 .hidden {

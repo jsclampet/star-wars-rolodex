@@ -1,57 +1,73 @@
-import axios, { Axios } from "axios";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import "./App.css";
-import userService from "./services/user-service";
 
 const App = () => {
   const [characters, setCharacters] = useState([]);
+  const [homeWorld, setHomeWorld] = useState([]);
+  const [species, setSpecies] = useState([]);
   const [isLoading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    const controller = new AbortController();
+    setLoading(true);
 
     async function getCharacters() {
-      setLoading(true);
-
+      const controller = new AbortController();
       const requestPeople = await axios.get(
-        `https://swapi.dev/api/people/?page=${page}`,
-        { signal: controller.signal }
+        `https://swapi.dev/api/people/?page=${page}`
       );
+      setCharacters(requestPeople.data.results);
 
-      const planetURLs = requestPeople.data.results.map(
-        (character) => character.homeworld
+      const filteredPlanetURLs = Array.from(
+        new Set(requestPeople.data.results.map((person) => person.homeworld))
       );
       const requestPlanets = await Promise.all(
-        planetURLs.map((url) => axios.get(url, { signal: controller.signal }))
+        filteredPlanetURLs.map((url) => axios.get(url))
       );
-      requestPlanets.forEach(({ data }, i) => {
-        console.log(i, data.url, data.name);
+      const planetsArray = requestPlanets.map((response) => {
+        return { name: response.data.name, url: response.data.url };
       });
+      setHomeWorld(planetsArray);
 
-      const specieURLs = requestPeople.data.results
-        .filter((character) => character.species.length)
-        .map((character) => character.species[0]);
+      const filteredSpecieUrls = Array.from(
+        new Set(
+          requestPeople.data.results
+            .filter((character) => character.species.length)
+            .map((character) => character.species[0])
+        )
+      );
       const requestSpecies = await Promise.all(
-        specieURLs.map((url) => axios.get(url, { signal: controller.signal }))
+        filteredSpecieUrls.map((url) => axios.get(url))
       );
-      requestSpecies.forEach(({ data }, i) => {
-        console.log(i, data.url, data.name);
+      const speciesArray = requestSpecies.map((specie) => {
+        return { name: specie.data.name, url: specie.data.url };
       });
+      setSpecies(speciesArray);
 
+      setLoading(false);
       return requestPeople;
     }
     getCharacters();
-    // for (const character of characters) {
-    //   get species data
-    //   const speciesResponse = await axios.get(character.species[0]);
-    //   character.speciesName = speciesResponse.data.name;
-    //   get planert data
-    //   const planetResponse = await axios.get(character.homeworld);
-    //   character.homeworldName = planetResponse.data.name;
-    setLoading(false);
-    return () => controller.abort();
   }, [page]);
+
+  const formatBirthYear = (character) => {
+    return character.birth_year !== "unknown"
+      ? character.birth_year.split("B")[0] + " BBY"
+      : "Unknown";
+  };
+
+  const getHomeWorld = (character) => {
+    if (!character.homeworld.length) return "unknown";
+    return homeWorld.filter((planet) => planet.url === character.homeworld)[0]
+      .name;
+  };
+
+  const getSpecies = (character) => {
+    if (!character.species.length) return "unknown";
+    return species.filter((specie) => specie.url === character.species[0])[0]
+      .name;
+  };
 
   return (
     <div className="p-5 pt-0 main-bg">
@@ -61,7 +77,7 @@ const App = () => {
       />
 
       {isLoading && (
-        <h1 className="text-light text-center">Loading, please wait!</h1>
+        <h1 className="text-light text-center mt-5">Loading, please wait!</h1>
       )}
       <div className={isLoading ? "hidden" : "visible"}>
         <form action="" className="">
@@ -90,20 +106,17 @@ const App = () => {
               <th>Species</th>
             </tr>
           </thead>
-
           <tbody>
-            {characters.length > 0 &&
-              planets.length > 0 &&
-              species.length > 0 &&
+            {!isLoading &&
               characters.map((character) => {
                 return (
                   <tr key={crypto.randomUUID()}>
                     <td>{character.name}</td>
                     <td>{formatBirthYear(character)}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>{character.height} cm</td>
+                    <td>{character.mass} kg</td>
+                    <td>{getHomeWorld(character) || "hello"}</td>
+                    <td>{getSpecies(character) || "hello"}</td>
                   </tr>
                 );
               })}
@@ -114,31 +127,63 @@ const App = () => {
             <li className="page-item">
               <a
                 className="page-link"
+                aria-disabled={page === 1}
                 onClick={() => (page > 1 ? setPage((prev) => prev - 1) : page)}
                 href="#"
               >
                 Previous
               </a>
             </li>
-            <li className="page-item">
+            <li onClick={() => setPage(1)} className="page-item">
               <a className="page-link" href="#">
                 1
               </a>
             </li>
-            <li className="page-item">
+            <li onClick={() => setPage(2)} className="page-item">
               <a className="page-link" href="#">
                 2
               </a>
             </li>
             <li className="page-item">
-              <a className="page-link" href="#">
+              <a onClick={() => setPage(3)} className="page-link" href="#">
                 3
+              </a>
+            </li>
+            <li onClick={() => setPage(4)} className="page-item">
+              <a className="page-link" href="#">
+                4
+              </a>
+            </li>
+            <li className="page-item">
+              <a onClick={() => setPage(5)} className="page-link" href="#">
+                5
+              </a>
+            </li>
+            <li className="page-item">
+              <a onClick={() => setPage(6)} className="page-link" href="#">
+                6
+              </a>
+            </li>
+            <li className="page-item">
+              <a onClick={() => setPage(7)} className="page-link" href="#">
+                7
+              </a>
+            </li>
+            <li className="page-item">
+              <a onClick={() => setPage(8)} className="page-link" href="#">
+                8
+              </a>
+            </li>
+            <li className="page-item">
+              <a onClick={() => setPage(9)} className="page-link" href="#">
+                9
               </a>
             </li>
             <li className="page-item">
               <a
                 className="page-link"
                 href="#"
+                aria-disabled={page === 9}
                 onClick={() => setPage(page + 1)}
               >
                 Next
