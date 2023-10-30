@@ -1,12 +1,12 @@
+import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+
 interface Props {
   onClickPrev: () => void;
   onClickNext: () => void;
-  onSearchInput: () => void;
-  onSubmit: () => void;
+  onSearchInput?: () => void;
+  onSubmit?: () => void;
   page: number;
 }
-//setPage(page > 1 ? setPage((prev) => prev - 1) : page)
-//setPage(page < 9 ? page + 1 : page)
 
 const Nav = ({
   onClickPrev,

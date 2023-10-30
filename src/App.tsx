@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import "./App.css";
 import Table, { Specie, Character, HomeWorld } from "./components/Table";
-import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import Nav from "./components/Nav";
 
 const App = () => {
@@ -69,7 +68,13 @@ const App = () => {
         <h1 className="text-light text-center mt-5">Loading, please wait!</h1>
       )}
       <div className={isLoading ? "hidden" : "visible"}>
-        <Nav />
+        <Nav
+          page={page}
+          onClickPrev={() => setPage(page > 1 ? (prev) => prev - 1 : page)}
+          onClickNext={() => setPage(page < 9 ? page + 1 : page)}
+          // onSearchInput={}
+          // onSubmit={}
+        />
         {!isLoading && (
           <Table
             characters={characters}
