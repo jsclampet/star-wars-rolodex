@@ -59,10 +59,7 @@ const App = () => {
 
   return (
     <div className="p-5 pt-0 main-bg">
-      <img
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Star_Wars_Logo..png/640px-Star_Wars_Logo..png"
-        alt=""
-      />
+      <img src="/src/assets/StarWarsLogo.png" alt="Star Wars Logo" />
 
       {isLoading && (
         <h1 className="text-light text-center mt-5">Loading, please wait!</h1>
