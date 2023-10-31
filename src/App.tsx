@@ -19,22 +19,28 @@ const App = () => {
       const requestPeople = await axios.get(
         `https://swapi.dev/api/people/?page=${page}`
       );
-      setCharacters(requestPeople.data.results);
+      const peopleResponse: Character[] = requestPeople.data.results;
+      console.log(peopleResponse);
 
-      const filteredPlanetURLs: string[] = Array.from(
-        new Set(
-          requestPeople.data.results.map(
-            (person: Character) => person.homeworld
-          )
-        )
+      // 'new Set' to avoid duplicates,
+      //'Array.from' to convert set back to array
+      //this reduces extra uneccessary get requests
+      const planetURLs = Array.from(
+        new Set(peopleResponse.map((person) => person.homeworld))
       );
+
+      const planetNames: string[] = [];
       const requestPlanets = await Promise.all(
-        filteredPlanetURLs.map((url) => axios.get(url))
+        planetURLs.map((url) => axios.get(url))
       );
-      const planetsArray = requestPlanets.map((response) => {
-        return { name: response.data.name, url: response.data.url };
+      console.log("Request Planets", requestPlanets);
+      requestPlanets.forEach((planet, i) => {
+        console.log("Planet Name: ", planet.data.name);
+        console.log("Planet URL: ", planet.data.url);
+        console.log("planetURLs[i]", planetURLs[i]);
+        planetNames.push(planet.data.name);
       });
-      setHomeWorld(planetsArray);
+      console.log("planetNames", planetNames);
 
       const filteredSpecieUrls = Array.from(
         new Set(
@@ -51,8 +57,16 @@ const App = () => {
       });
       setSpecies(speciesArray);
 
-      setLoading(false);
-      return requestPeople;
+      const cacheSpecies = [...speciesArray, ...species];
+
+      // loop through each character (massage data)
+      // set chacter homeworld name
+      // set character species name
+
+      // set character state
+
+      // setLoading(false);
+      // return requestPeople;
     }
     getCharacters();
   }, [page]);
