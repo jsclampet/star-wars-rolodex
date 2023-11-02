@@ -90,9 +90,8 @@ const App = () => {
 
   const displayedCharacters = characters.filter((char, index) => {
     //test, in order to see if this could replace render 'character' dependency
-    return index >= 0 && index <= 9;
-    // production under this line
-    // index >= page * 10 - 10 && index <= page * 10 - 1;
+    //index >= 0 && index <= 9;
+    return index >= page * 10 - 10 && index <= page * 10 - 1;
   });
 
   return (
