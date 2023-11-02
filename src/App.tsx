@@ -86,8 +86,14 @@ const App = () => {
     getCharacters();
   }, [page]);
 
+  useEffect(() => {
+    async function searchCharacters() {
+      let searchResults;
+    }
+  });
+
   const displayedCharacters = characters.filter((char, index) => {
-    return index <= page * 10 - 1;
+    return index >= page * 10 - 10 && index <= page * 10 - 1;
   });
 
   return (

@@ -1,3 +1,10 @@
+TO DO NEXT
+- Review App.tsx lines 89 through 97
+- Add state for input:
+  -  onChange (to detect when input empty, restore table data <displayed characters>)
+  -  onSubmit (to query search)
+
+
 ### Error Handling
 COMPLETE
 
