@@ -9,8 +9,12 @@ TO DO NEXT
 COMPLETE
 
 ### Caching 
+
 - Save responses to state
 - variable 'displayedCharacters' to show up to 10, increment/decrement 10 based on prev/next click
+    - displayedCharacters (with test fn code written) successfully replaces 'characters'
+    - now implement characters as cache? ... each "next" adds... 
+      - [...characters, more characters]
 
 
 ## NAV

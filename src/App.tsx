@@ -15,9 +15,11 @@ const App = () => {
     setError("");
 
     async function getCharacters() {
+      const controller = new AbortController();
       try {
         const requestPeople = await axios.get(
-          `https://swapi.dev/api/people/?page=${page}`
+          `https://swapi.dev/api/people/?page=${page}`,
+          { signal: controller.signal }
         );
         const peopleResponse: Character[] = requestPeople.data.results;
 
@@ -26,7 +28,7 @@ const App = () => {
         );
         const planetNames: string[] = [];
         const requestPlanets = await Promise.all(
-          planetURLs.map((url) => axios.get(url))
+          planetURLs.map((url) => axios.get(url, { signal: controller.signal }))
         );
         requestPlanets.forEach((planet) => {
           planetNames.push(planet.data.name);
@@ -40,20 +42,13 @@ const App = () => {
           )
         );
         const requestSpecies = await Promise.all(
-          specieURLs.map((url) => axios.get(url))
+          specieURLs.map((url) => axios.get(url, { signal: controller.signal }))
         );
         const speciesNames: string[] = requestSpecies.map(
           (specie) => specie.data.name
         );
 
         const species_name = (character: Character) => {
-          console.log("character.species[0]", character.species[0]);
-          console.log("indexOf", specieURLs.indexOf(character.species[0]));
-          console.log(
-            "speciesName indexOf",
-            speciesNames[specieURLs.indexOf(character.species[0])]
-          );
-
           return specieURLs.includes(character.species[0])
             ? speciesNames[specieURLs.indexOf(character.species[0])]
             : "Unknown";
@@ -66,7 +61,7 @@ const App = () => {
         };
 
         // const cacheSpecies = [...speciesArray, ...species];
-        const characterList = peopleResponse.map((character, i) => {
+        const characterList = peopleResponse.map((character) => {
           return {
             ...character,
             birth_year: character.birth_year.split("BBY")[0] + " BBY",
@@ -82,18 +77,22 @@ const App = () => {
         setLoading(false);
         setError(`${err}`);
       }
+      return () => controller.abort();
     }
     getCharacters();
   }, [page]);
 
   useEffect(() => {
     async function searchCharacters() {
-      let searchResults;
+      let searchResults = axios.get();
     }
-  });
+  }, []);
 
   const displayedCharacters = characters.filter((char, index) => {
-    return index >= page * 10 - 10 && index <= page * 10 - 1;
+    //test, in order to see if this could replace render 'character' dependency
+    return index >= 0 && index <= 9;
+    // production under this line
+    // index >= page * 10 - 10 && index <= page * 10 - 1;
   });
 
   return (
@@ -114,7 +113,7 @@ const App = () => {
           </h3>
           <h4 className="text-danger">
             Please wait a moment before refreshing the page. Contact server
-            admin the issue persist
+            admin if issue persists
           </h4>
         </div>
       ) : (
@@ -127,7 +126,7 @@ const App = () => {
               // onSearchInput={}
               // onSubmit={}
             />
-            <Table characters={characters} />
+            <Table characters={displayedCharacters} />
           </div>
         )
       )}
