@@ -8,84 +8,87 @@ const App = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [isLoading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setLoading(true);
 
     async function getCharacters() {
-      const requestPeople = await axios.get(
-        `https://swapi.dev/api/people/?page=${page}`
-      );
-      const peopleResponse: Character[] = requestPeople.data.results;
+      try {
+        const requestPeople = await axios.get(
+          `https://swapi.dev/api/people/?page=${page}`
+        );
+        const peopleResponse: Character[] = requestPeople.data.results;
 
-      const planetURLs = Array.from(
-        new Set(peopleResponse.map((person) => person.homeworld))
-      );
-      const planetNames: string[] = [];
-      const requestPlanets = await Promise.all(
-        planetURLs.map((url) => axios.get(url))
-      );
-      requestPlanets.forEach((planet) => {
-        planetNames.push(planet.data.name);
-      });
+        const planetURLs = Array.from(
+          new Set(peopleResponse.map((person) => person.homeworld))
+        );
+        const planetNames: string[] = [];
+        const requestPlanets = await Promise.all(
+          planetURLs.map((url) => axios.get(url))
+        );
+        requestPlanets.forEach((planet) => {
+          planetNames.push(planet.data.name);
+        });
 
-      const specieURLs: string[] = Array.from(
-        new Set(
-          peopleResponse
-            .filter((character: Character) => character.species.length)
-            .map((character: Character) => character.species[0])
-        )
-      );
-      const requestSpecies = await Promise.all(
-        specieURLs.map((url) => axios.get(url))
-      );
-      const speciesNames: string[] = requestSpecies.map(
-        (specie) => specie.data.name
-      );
-
-      const species_name = (character: Character) => {
-        console.log("character.species[0]", character.species[0]);
-        console.log("indexOf", specieURLs.indexOf(character.species[0]));
-        console.log(
-          "speciesName indexOf",
-          speciesNames[specieURLs.indexOf(character.species[0])]
+        const specieURLs: string[] = Array.from(
+          new Set(
+            peopleResponse
+              .filter((character: Character) => character.species.length)
+              .map((character: Character) => character.species[0])
+          )
+        );
+        const requestSpecies = await Promise.all(
+          specieURLs.map((url) => axios.get(url))
+        );
+        const speciesNames: string[] = requestSpecies.map(
+          (specie) => specie.data.name
         );
 
-        return specieURLs.includes(character.species[0])
-          ? speciesNames[specieURLs.indexOf(character.species[0])]
-          : "Unknown";
-      };
+        const species_name = (character: Character) => {
+          console.log("character.species[0]", character.species[0]);
+          console.log("indexOf", specieURLs.indexOf(character.species[0]));
+          console.log(
+            "speciesName indexOf",
+            speciesNames[specieURLs.indexOf(character.species[0])]
+          );
 
-      const homeworld_name = (character: Character) => {
-        return planetURLs.includes(character.homeworld)
-          ? planetNames[planetURLs.indexOf(character.homeworld)]
-          : "Unknown";
-      };
-
-      // const cacheSpecies = [...speciesArray, ...species];
-      const characterList = peopleResponse.map((character, i) => {
-        return {
-          ...character,
-          birth_year: character.birth_year.split("BBY")[0] + " BBY",
-          species_name: species_name(character),
-          homeworld_name: homeworld_name(character),
+          return specieURLs.includes(character.species[0])
+            ? speciesNames[specieURLs.indexOf(character.species[0])]
+            : "Unknown";
         };
-      });
 
-      setCharacters(characterList);
-      // loop through each character (massage data)
-      // set chacter homeworld name
-      // set character species name
+        const homeworld_name = (character: Character) => {
+          return planetURLs.includes(character.homeworld)
+            ? planetNames[planetURLs.indexOf(character.homeworld)]
+            : "Unknown";
+        };
 
-      // set character state
+        // const cacheSpecies = [...speciesArray, ...species];
+        const characterList = peopleResponse.map((character, i) => {
+          return {
+            ...character,
+            birth_year: character.birth_year.split("BBY")[0] + " BBY",
+            species_name: species_name(character),
+            homeworld_name: homeworld_name(character),
+          };
+        });
 
-      setLoading(false);
-      // return requestPeople;
-      console.log(characters);
+        setCharacters(characterList);
+
+        setLoading(false);
+      } catch (err) {
+        setError(
+          `Something went wrong. Server returned error message: ${err}. Try refreshing the page. If you are still experiencing issues after refresh, please reach out to SWAPI server admin.`
+        );
+      }
     }
     getCharacters();
-    console.log(characters);
   }, [page]);
+
+  const displayedCharacters = characters.filter((char, index) => {
+    return index <= page * 10 - 1;
+  });
 
   return (
     <div className="p-5 pt-0 main-bg">
