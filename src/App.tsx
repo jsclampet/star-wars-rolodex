@@ -12,6 +12,7 @@ const App = () => {
 
   useEffect(() => {
     setLoading(true);
+    setError("");
 
     async function getCharacters() {
       try {
@@ -78,9 +79,8 @@ const App = () => {
 
         setLoading(false);
       } catch (err) {
-        setError(
-          `Something went wrong. Server returned error message: ${err}. Try refreshing the page. If you are still experiencing issues after refresh, please reach out to SWAPI server admin.`
-        );
+        setLoading(false);
+        setError(`${err}`);
       }
     }
     getCharacters();
@@ -97,16 +97,34 @@ const App = () => {
       {isLoading && (
         <h1 className="text-light text-center mt-5">Loading, please wait!</h1>
       )}
-      <div className={isLoading ? "hidden" : "visible"}>
-        <Nav
-          page={page}
-          onClickPrev={() => setPage(page > 1 ? (prev) => prev - 1 : page)}
-          onClickNext={() => setPage(page < 9 ? page + 1 : page)}
-          // onSearchInput={}
-          // onSubmit={}
-        />
-        {!isLoading && <Table characters={characters} />}
-      </div>
+
+      {error ? (
+        <div className="error-div">
+          <h2 className="text-danger mb-4">
+            Something went wrong! You've encountered the following error:
+          </h2>
+          <h3 className="mb-4">
+            <em>"{error}"</em>
+          </h3>
+          <h4 className="text-danger">
+            Please wait a moment before refreshing the page. Contact server
+            admin the issue persist
+          </h4>
+        </div>
+      ) : (
+        !isLoading && (
+          <div className={isLoading ? "hidden" : "visible"}>
+            <Nav
+              page={page}
+              onClickPrev={() => setPage(page > 1 ? (prev) => prev - 1 : page)}
+              onClickNext={() => setPage(page < 9 ? page + 1 : page)}
+              // onSearchInput={}
+              // onSubmit={}
+            />
+            <Table characters={characters} />
+          </div>
+        )
+      )}
     </div>
   );
 };

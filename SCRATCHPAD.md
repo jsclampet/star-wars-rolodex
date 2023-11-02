@@ -1,6 +1,5 @@
 ### Error Handling
-- 404
-- CORS
+COMPLETE
 
 ### Caching 
 - Save responses to state
