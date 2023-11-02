@@ -15,7 +15,7 @@ COMPLETE
     - displayedCharacters (with test fn code written) successfully replaces 'characters'
     - now implement characters as cache? ... each "next" adds... 
       - [...characters, more characters]
-
+- IM HERE... in the middle of this ... created a BIG MESS ... need to clean up (bunch of stuff commented, some values 'undefined' , etc ... )
 
 ## NAV
 ### Functionality

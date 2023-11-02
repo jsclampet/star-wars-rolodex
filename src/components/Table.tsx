@@ -7,6 +7,8 @@ export interface Character {
   species: string[];
   species_name?: string;
   homeworld_name?: string;
+  page?: number;
+  data: [];
 }
 
 interface Props {

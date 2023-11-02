@@ -11,8 +11,13 @@ const App = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setLoading(true);
     setError("");
+    if (characters.length >= page) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
 
     async function getCharacters() {
       const controller = new AbortController();
@@ -21,6 +26,7 @@ const App = () => {
           `https://swapi.dev/api/people/?page=${page}`,
           { signal: controller.signal }
         );
+
         const peopleResponse: Character[] = requestPeople.data.results;
 
         const planetURLs = Array.from(
@@ -70,8 +76,7 @@ const App = () => {
           };
         });
 
-        setCharacters(characterList);
-
+        setCharacters([...characters, { page: page, data: characterList }]);
         setLoading(false);
       } catch (err) {
         setLoading(false);
@@ -80,19 +85,18 @@ const App = () => {
       return () => controller.abort();
     }
     getCharacters();
+    console.log(characters);
   }, [page]);
 
-  useEffect(() => {
-    async function searchCharacters() {
-      let searchResults = axios.get();
-    }
-  }, []);
+  // useEffect(() => {
+  //   async function searchCharacters() {
+  //     let searchResults = axios.get();
+  //   }
+  // }, []);
 
-  const displayedCharacters = characters.filter((char, index) => {
-    //test, in order to see if this could replace render 'character' dependency
-    //index >= 0 && index <= 9;
-    return index >= page * 10 - 10 && index <= page * 10 - 1;
-  });
+  const displayedCharacters = characters[page - 1]
+    ? characters[page - 1].data
+    : null;
 
   return (
     <div className="p-5 pt-0 main-bg">
@@ -116,7 +120,8 @@ const App = () => {
           </h4>
         </div>
       ) : (
-        !isLoading && (
+        !isLoading &&
+        characters.length >= page && (
           <div className={isLoading ? "hidden" : "visible"}>
             <Nav
               page={page}
