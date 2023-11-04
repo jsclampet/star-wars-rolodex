@@ -9,6 +9,7 @@ const App = () => {
   const [isLoading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [error, setError] = useState("");
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     setError("");
@@ -18,12 +19,12 @@ const App = () => {
     }
 
     setLoading(true);
-    const endpoint = `people/?page=${page}`;
+    const endpoint = searching ? `/?search=r2` : `/?page=${page}`;
     async function getCharacters() {
       const controller = new AbortController();
       try {
         const requestPeople = await axios.get(
-          `https://swapi.dev/api/people/?page=${page}`,
+          `https://swapi.dev/api/people${endpoint}`,
           {
             signal: controller.signal,
           }
@@ -87,7 +88,7 @@ const App = () => {
       return () => controller.abort();
     }
     getCharacters();
-  }, [page]);
+  }, [page, searching]);
 
   const displayedCharacters = characters[page - 1]
     ? characters[page - 1].data
