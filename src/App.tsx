@@ -18,13 +18,15 @@ const App = () => {
     }
 
     setLoading(true);
-
+    const endpoint = `people/?page=${page}`;
     async function getCharacters() {
       const controller = new AbortController();
       try {
         const requestPeople = await axios.get(
           `https://swapi.dev/api/people/?page=${page}`,
-          { signal: controller.signal }
+          {
+            signal: controller.signal,
+          }
         );
 
         const peopleResponse: Character[] = requestPeople.data.results;
@@ -78,21 +80,14 @@ const App = () => {
 
         setCharacters([...characters, { page: page, data: characterList }]);
         setLoading(false);
-      } catch (err) {
+      } catch (err: unknown) {
         setLoading(false);
-        setError(`${err}`);
+        setError(`${err.message}`);
       }
       return () => controller.abort();
     }
     getCharacters();
-    console.log(characters);
   }, [page]);
-
-  // useEffect(() => {
-  //   async function searchCharacters() {
-  //     let searchResults = axios.get();
-  //   }
-  // }, []);
 
   const displayedCharacters = characters[page - 1]
     ? characters[page - 1].data
@@ -127,7 +122,9 @@ const App = () => {
               page={page}
               onClickPrev={() => setPage(page > 1 ? (prev) => prev - 1 : page)}
               onClickNext={() => setPage(page < 9 ? page + 1 : page)}
-              // onSearchInput={}
+              onSearchInput={(e: InputEvent) => {
+                console.log(e.currentTarget.value);
+              }}
               // onSubmit={}
             />
             <Table characters={displayedCharacters} />
