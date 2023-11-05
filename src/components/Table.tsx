@@ -8,7 +8,7 @@ export interface Character {
   species_name?: string;
   homeworld_name?: string;
   page?: number;
-  data: [];
+  data?: [];
 }
 
 interface Props {
@@ -35,8 +35,8 @@ const Table = ({ characters }: Props) => {
               <tr key={crypto.randomUUID()}>
                 <td>{character.name}</td>
                 <td>{character.birth_year}</td>
-                <td>{character.height} cm</td>
-                <td>{character.mass} kg</td>
+                <td>{character.height} </td>
+                <td>{character.mass} </td>
                 <td>{character.homeworld_name}</td>
                 <td>{character.species_name}</td>
               </tr>

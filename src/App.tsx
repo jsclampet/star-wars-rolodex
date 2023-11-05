@@ -20,6 +20,7 @@ const App = () => {
     setError("");
     setLoading(true);
 
+    let isCharacterCached = false;
     if (!showSearchResults && characters.length >= page) {
       setLoading(false);
       return;
@@ -28,8 +29,19 @@ const App = () => {
       // pending results, may need 2 layer iteration
       // will use some() to determine if characters contain userInput
       // if truthy, will store result to characterSearchResults with find()
-      characters.forEach((character) => console.log(character));
+      characters.forEach((characterList) => {
+        console.log(characterList.page);
+        characterList.data.forEach((character: Character) => {
+          if (character.name.toLowerCase() === userInput.toLowerCase()) {
+            console.log(character);
+            setCharacterSearchResult(character);
+            isCharacterCached = true;
+            return;
+          }
+        });
+      });
     }
+    if (isCharacterCached) return;
 
     async function getCharacters() {
       const controller = new AbortController();
@@ -103,9 +115,12 @@ const App = () => {
     getCharacters();
   }, [page, showSearchResults, toggleSearch]);
 
-  const displayedCharacters = characters[page - 1]
-    ? characters[page - 1].data
-    : null;
+  const displayedCharacters =
+    !showSearchResults && characters[page - 1]
+      ? characters[page - 1].data
+      : showSearchResults && characterSearchResult
+      ? characterSearchResult
+      : null;
 
   return (
     <div className="p-5 pt-0 main-bg">
@@ -143,11 +158,11 @@ const App = () => {
                 e.preventDefault();
                 setShowSearchResults(true);
                 setToggleSearch(!toggleSearch);
+                console.log(characterSearchResult);
               }}
               onSearchInput={(e: ChangeEvent<HTMLInputElement>) => {
                 setUserInput(e.target.value);
               }}
-              // onSubmit={}
             />
             <Table characters={displayedCharacters} />
           </div>
