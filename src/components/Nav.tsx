@@ -1,10 +1,12 @@
+import { ChangeEvent, FormEvent, FormEventHandler } from "react";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 
 interface Props {
   onClickPrev: () => void;
   onClickNext: () => void;
   onSearchInput?: () => void;
-  onSubmit?: () => void;
+  onSubmit: (e: FormEvent<HTMLFormElement>) => void;
+  onClear?: () => void;
   page: number;
 }
 
@@ -14,6 +16,7 @@ const Nav = ({
   onSearchInput,
   onSubmit,
   page,
+  onClear,
 }: Props) => {
   return (
     <nav>
@@ -25,22 +28,25 @@ const Nav = ({
         <BsChevronLeft />
       </button>
 
-      <form action="" className="">
+      <form onSubmit={(e) => onSubmit(e)}>
         <div className="form-group mb-4">
           <input
             placeholder="Search by keyword"
             type="search"
             id="search"
             alt="Search Bar"
-            className=" bg-transparent"
-            onChange={onSearchInput}
+            className="bg-dark"
+            onInput={onSearchInput}
           />
-          <button
-            className="btn btn-secondary "
-            type="submit"
-            onSubmit={onSubmit}
-          >
+          <button className="btn btn-light " type="submit">
             Search
+          </button>
+          <button
+            className="btn btn-outline-light"
+            onClick={onClear}
+            type="button"
+          >
+            Clear Search
           </button>
         </div>
       </form>

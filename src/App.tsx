@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import "./App.css";
 import Table, { Character } from "./components/Table";
 import Nav from "./components/Nav";
@@ -9,22 +9,26 @@ const App = () => {
   const [isLoading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [error, setError] = useState("");
-  const [searching, setSearching] = useState(false);
+  const [userInput, setUserInput] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [toggleSearch, setToggleSearch] = useState(true);
 
   useEffect(() => {
     setError("");
-    if (characters.length >= page) {
+    setLoading(true);
+
+    if (!showSearchResults && characters.length >= page) {
       setLoading(false);
       return;
     }
 
-    setLoading(true);
-    const endpoint = searching ? `/?search=r2` : `/?page=${page}`;
     async function getCharacters() {
       const controller = new AbortController();
       try {
         const requestPeople = await axios.get(
-          `https://swapi.dev/api/people${endpoint}`,
+          !showSearchResults
+            ? `https://swapi.dev/api/people/?page=${page}`
+            : `https://swapi.dev/api/people/?search=${userInput}`,
           {
             signal: controller.signal,
           }
@@ -88,7 +92,7 @@ const App = () => {
       return () => controller.abort();
     }
     getCharacters();
-  }, [page, searching]);
+  }, [page, showSearchResults, toggleSearch]);
 
   const displayedCharacters = characters[page - 1]
     ? characters[page - 1].data
@@ -121,10 +125,18 @@ const App = () => {
           <div className={isLoading ? "hidden" : "visible"}>
             <Nav
               page={page}
-              onClickPrev={() => setPage(page > 1 ? (prev) => prev - 1 : page)}
-              onClickNext={() => setPage(page < 9 ? page + 1 : page)}
-              onSearchInput={(e: InputEvent) => {
-                console.log(e.currentTarget.value);
+              onClickPrev={() => setPage((currentPage) => currentPage - 1)}
+              onClickNext={() => setPage((currentPage) => currentPage + 1)}
+              onClear={() => {
+                setShowSearchResults(false);
+              }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                setShowSearchResults(true);
+                setToggleSearch(!toggleSearch);
+              }}
+              onSearchInput={(e: ChangeEvent<HTMLInputElement>) => {
+                setUserInput(e.target.value);
               }}
               // onSubmit={}
             />

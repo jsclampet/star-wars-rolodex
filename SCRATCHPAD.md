@@ -31,3 +31,6 @@ COMPLETE
 - Upon further research, CORS error could only be resolved on the server side
 - However, we could inform user of request failure via caught error/exceptions 
 
+<!-- DOWN BELOW, PROBLEM... STATUS AS OF 11/4 -->
+
+Search works ... kinda ... but it runs through the rest of the function which saves the results in the characters object ... causing a 
