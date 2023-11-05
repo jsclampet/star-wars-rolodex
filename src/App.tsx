@@ -6,6 +6,9 @@ import Nav from "./components/Nav";
 
 const App = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [characterSearchResult, setCharacterSearchResult] = useState<
+    Character[]
+  >([]);
   const [isLoading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [error, setError] = useState("");
@@ -20,6 +23,12 @@ const App = () => {
     if (!showSearchResults && characters.length >= page) {
       setLoading(false);
       return;
+    } else if (showSearchResults && characters) {
+      // checking what 1 layer iteration would return
+      // pending results, may need 2 layer iteration
+      // will use some() to determine if characters contain userInput
+      // if truthy, will store result to characterSearchResults with find()
+      characters.forEach((character) => console.log(character));
     }
 
     async function getCharacters() {
