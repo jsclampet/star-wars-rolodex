@@ -6,42 +6,23 @@ import Nav from "./components/Nav";
 
 const App = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [characterSearchResult, setCharacterSearchResult] = useState<
-    Character[]
-  >([]);
-  const [isLoading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [error, setError] = useState("");
+  const [characterSearchResult, setCharacterSearchResult] = useState<Character>(
+    {}
+  );
   const [userInput, setUserInput] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [toggleSearch, setToggleSearch] = useState(true);
+  const [isLoading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     setError("");
     setLoading(true);
-
-    let isCharacterCached = false;
     if (!showSearchResults && characters.length >= page) {
       setLoading(false);
       return;
-    } else if (showSearchResults && characters) {
-      // checking what 1 layer iteration would return
-      // pending results, may need 2 layer iteration
-      // will use some() to determine if characters contain userInput
-      // if truthy, will store result to characterSearchResults with find()
-      characters.forEach((characterList) => {
-        console.log(characterList.page);
-        characterList.data.forEach((character: Character) => {
-          if (character.name.toLowerCase() === userInput.toLowerCase()) {
-            console.log(character);
-            setCharacterSearchResult(character);
-            isCharacterCached = true;
-            return;
-          }
-        });
-      });
     }
-    if (isCharacterCached) return;
 
     async function getCharacters() {
       const controller = new AbortController();
@@ -104,7 +85,9 @@ const App = () => {
           };
         });
 
-        setCharacters([...characters, { page: page, data: characterList }]);
+        showSearchResults
+          ? setCharacters([...characters, { page: page, data: characterList }])
+          : setCharacterSearchResult(characterList);
         setLoading(false);
       } catch (err: unknown) {
         setLoading(false);
