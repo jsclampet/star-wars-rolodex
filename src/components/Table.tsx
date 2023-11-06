@@ -13,9 +13,10 @@ export interface Character {
 
 interface Props {
   characters: Character[];
+  displayedResults: [];
 }
 
-const Table = ({ characters }: Props) => {
+const Table = ({ characters, displayedResults }: Props) => {
   return (
     <div>
       <table className="table table-bordered mb-4">
@@ -31,16 +32,28 @@ const Table = ({ characters }: Props) => {
         </thead>
         <tbody>
           {characters.map((character) => {
-            return (
-              <tr key={crypto.randomUUID()}>
-                <td>{character.name}</td>
-                <td>{character.birth_year}</td>
-                <td>{character.height} </td>
-                <td>{character.mass} </td>
-                <td>{character.homeworld_name}</td>
-                <td>{character.species_name}</td>
-              </tr>
-            );
+            if (displayedResults.length) {
+              return (
+                <tr key={crypto.randomUUID()}>
+                  <td>{character.name}</td>
+                  <td>{character.birth_year}</td>
+                  <td>{character.height} </td>
+                  <td>{character.mass} </td>
+                  <td>{character.homeworld_name}</td>
+                  <td>{character.species_name}</td>
+                </tr>
+              );
+            } else {
+              return (
+                <tr key={crypto.randomUUID()}>
+                  <td colSpan={5}>
+                    Could not find your search results. Try a different
+                    keyword(s) or click "Clear Results" to display all
+                    Characters.
+                  </td>
+                </tr>
+              );
+            }
           })}
         </tbody>
       </table>

@@ -3,12 +3,13 @@ import { ChangeEvent, useEffect, useState } from "react";
 import "./App.css";
 import Table, { Character } from "./components/Table";
 import Nav from "./components/Nav";
+import ErrorMessage from "./components/ErrorMessage";
 
 const App = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [characterSearchResult, setCharacterSearchResult] = useState<Character>(
-    {}
-  );
+  const [characterSearchResult, setCharacterSearchResult] = useState<
+    Character[]
+  >([]);
   const [userInput, setUserInput] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [toggleSearch, setToggleSearch] = useState(true);
@@ -17,8 +18,12 @@ const App = () => {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
+    //clear errors and set to loading state
+    setCharacterSearchResult([]);
     setError("");
     setLoading(true);
+
+    // if navigating through pagination and chars already cached, exit useEffect
     if (!showSearchResults && characters.length >= page) {
       setLoading(false);
       return;
@@ -27,6 +32,7 @@ const App = () => {
     async function getCharacters() {
       const controller = new AbortController();
       try {
+        // main API call, depending if searching or navigating
         const requestPeople = await axios.get(
           !showSearchResults
             ? `https://swapi.dev/api/people/?page=${page}`
@@ -38,6 +44,7 @@ const App = () => {
 
         const peopleResponse: Character[] = requestPeople.data.results;
 
+        // set planets
         const planetURLs = Array.from(
           new Set(peopleResponse.map((person) => person.homeworld))
         );
@@ -49,6 +56,7 @@ const App = () => {
           planetNames.push(planet.data.name);
         });
 
+        // set species
         const specieURLs: string[] = Array.from(
           new Set(
             peopleResponse
@@ -63,6 +71,7 @@ const App = () => {
           (specie) => specie.data.name
         );
 
+        // format and set values for
         const species_name = (character: Character) => {
           return specieURLs.includes(character.species[0])
             ? speciesNames[specieURLs.indexOf(character.species[0])]
@@ -79,15 +88,21 @@ const App = () => {
         const characterList = peopleResponse.map((character) => {
           return {
             ...character,
-            birth_year: character.birth_year.split("BBY")[0] + " BBY",
+            birth_year:
+              character.birth_year === "unknown"
+                ? character.birth_year
+                : character.birth_year.split("BBY")[0] + " BBY",
             species_name: species_name(character),
             homeworld_name: homeworld_name(character),
           };
         });
 
-        showSearchResults
-          ? setCharacters([...characters, { page: page, data: characterList }])
-          : setCharacterSearchResult(characterList);
+        if (showSearchResults) {
+          setCharacterSearchResult([characterList]);
+          setLoading(false);
+          return;
+        }
+        setCharacters([...characters, { page: page, data: characterList }]);
         setLoading(false);
       } catch (err: unknown) {
         setLoading(false);
@@ -114,23 +129,13 @@ const App = () => {
       )}
 
       {error ? (
-        <div className="error-div">
-          <h2 className="text-danger mb-4">
-            Something went wrong! You've encountered the following error:
-          </h2>
-          <h3 className="mb-4">
-            <em>"{error}"</em>
-          </h3>
-          <h4 className="text-danger">
-            Please wait a moment before refreshing the page. Contact server
-            admin if issue persists
-          </h4>
-        </div>
+        <ErrorMessage message={error} />
       ) : (
         !isLoading &&
         characters.length >= page && (
           <div className={isLoading ? "hidden" : "visible"}>
             <Nav
+              isSearchView={showSearchResults}
               page={page}
               onClickPrev={() => setPage((currentPage) => currentPage - 1)}
               onClickNext={() => setPage((currentPage) => currentPage + 1)}
@@ -147,7 +152,10 @@ const App = () => {
                 setUserInput(e.target.value);
               }}
             />
-            <Table characters={displayedCharacters} />
+            <Table
+              characters={displayedCharacters}
+              displayedResults={displayedCharacters}
+            />
           </div>
         )
       )}
